@@ -33,7 +33,7 @@ def conf_create_linux():
         print("Here is your host details: ")
         for checks in short_list:
             print(checks)
-        confirm = input("Are you happy with this list? y or n ").lower()
+        confirm = input("Are you happy with this information? y or n ").lower()
         if confirm == "y":
             break
         else:
@@ -54,7 +54,7 @@ def conf_create_windows():
         print("Here is your host details: ")
         for checks in short_list:
             print(checks)
-        confirm = input("Are you happy with this list? y or n ").lower()
+        confirm = input("Are you happy with this information? y or n ").lower()
         if confirm == "y":
             break
         else:
@@ -84,14 +84,17 @@ def template_windows(host, hostip, shortname):
       vars.notification["mail"] =  {
         groups = [ "icingaadmins" ]
       }
-    }""" % (shortname, shortname, shortname, host, shortname, host, hostip, shortname)
+    }
+    """ % (shortname, shortname, shortname, host, shortname, host, hostip, shortname)
     with open("/etc/icinga2/conf.d/hosts.d/{}.conf".format(shortname), "w") as file:
         file.write(conf_file)
+    print("Your config has been created, you can edit it in /etc/icinga2/conf.d/hosts.d/{}.conf  "
+          "Don't forget to restart the icinga2 server for the changes to take affect!".format(shortname))
 
 
 def template_linux(host, hostip, shortname):
     conf_linux = """
-     object Zone "%s" {
+    object Zone "%s" {
       endpoints = [ "%s" ]
       parent = "master"
     }
@@ -116,9 +119,12 @@ def template_linux(host, hostip, shortname):
       vars.notification["mail"] = {
         groups = [ "icingaadmins" ]
       }
-    } """ % (shortname, shortname, shortname, host, shortname, hostip, shortname)
+    } 
+    """ % (shortname, shortname, shortname, host, shortname, hostip, shortname)
     with open("/etc/icinga2/conf.d/hosts.d/{}.conf".format(shortname), "w") as file:
         file.write(conf_linux)
+    print("Your config has been created, you can edit it in /etc/icinga2/conf.d/hosts.d/{}.conf "
+          "Don't forget to restart the icinga2 server for the changes to take affect!".format(shortname))
 
 
 host_folder = Path("/etc/icinga2/conf.d/hosts.d")
