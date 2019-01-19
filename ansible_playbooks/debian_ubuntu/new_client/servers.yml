@@ -35,3 +35,24 @@
           - vim-addon-manager
         update_cache: yes
         state: latest
+    - name: include vars
+      include_vars:
+        file: "{{ ansible_hostname }}.yml"
+        name: host
+    - name: creating cert_folder
+      file:
+        path: /var/lib/icinga2/certs
+        state: directory
+        owner: nagios
+        group: nagios
+        mode: 0755
+    - name: creating cert_key
+      shell:
+        icinga2 pki new-cert --cn short_name --key /var/lib/icinga2/certs/"{{host.get('short_name')}}".key --cert /var/lib/icinga2/certs/"{{host.get('short_name')}}".crt
+    - name: getting certificate of master
+      shell:
+        icinga2 pki save-cert --key /var/lib/icinga2/certs/"{{host.get('short_name')}}".key --cert /var/lib/icinga2/certs/"{{host.get('short_name')}}".crt --trustedcert /var/lib/icinga2/certs/trusted-parent.crt --host "{{host.get('master_server')}}"
+    - name: joining node to master
+      shell:
+        icinga2 node setup --ticket "{{host.get('request_ticket')}}" --cn "{{host.get('short_name')}}" --endpoint "{{host.get('master_shortname')}}","{{host.get('master_server')}}",5665 --zone "{{host.get('short_name')}}" --parent_zone master --parent_host "{{host.get('master_server')}}" --trustedcert /var/lib/icinga2/certs/trusted-parent.crt --accept-commands --accept-config --disable-confd
+

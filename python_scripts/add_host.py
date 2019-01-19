@@ -26,9 +26,8 @@ def conf_create_linux():
         short_list = []
         shortname = input("What is the name you gave icinga for this linux machine? ")
         short_list.append(shortname)
-        hostip = input("What's the IP address internally for the host? ")
-        short_list.append(hostip)
         host = input("What is the external IP or FQDN for the host? ")
+        hostip = host
         short_list.append(host)
         print("Here is your host details: ")
         for checks in short_list:
