@@ -1,0 +1,55 @@
+---
+- hosts: servers
+  remote_user: ansible
+  become: yes
+  become_method: sudo
+  connection: ssh
+  gather_facts: yes
+  tasks:
+    - name: Adding icingakey
+      apt_key:
+        url: https://packages.icinga.com/icinga.key
+        id: F51A91A5EE001AA5D77D53C4C6E319C334410682
+    - name: Adding ansible template
+      template:
+        src: icinga.j2
+        dest: /etc/apt/sources.list.d/icinga.list
+        backup: yes
+    - name: Adding certbot repo
+      apt_repository:
+        repo: 'ppa:certbot/certbot'
+    - name: Updating cache
+      apt:
+        update_cache: yes
+    - name: Installing basic packages
+      apt:
+        name:
+          - vim
+          - screen
+          - python-certbot-apache
+          - rdiff-backup
+          - python3-pip
+          - python-pip
+          - wget
+          - rsync
+          - icinga2
+          - icingaweb2
+          - icinga2-ido-mysql
+          - icingacli
+          - monitoring-plugins
+          - apache2
+          - php
+          - libapache2-mod-php
+          - php-mysql
+          - php-ldap
+          - vim-icinga2
+          - vim-addon-manager
+        update_cache: yes
+        state: latest
+    - name: Replacing service file
+      template:
+        src: services.j2
+        dest: /etc/icinga2/conf.d/services.conf
+        backup: yes
+
+

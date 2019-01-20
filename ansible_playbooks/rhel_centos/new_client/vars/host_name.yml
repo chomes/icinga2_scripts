@@ -1,0 +1,5 @@
+---
+short_name:
+master_server:
+master_shortname:
+request_ticket:  #get this from running icinga2 pki ticket --cn client_name on the icinga_server

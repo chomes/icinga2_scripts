@@ -104,6 +104,14 @@ apply Service for (procs => config in host.vars.procs) {
   vars += config
 }
 
+apply Service "swap" {
+  import "generic-service"
+
+  check_command = "swap"
+  command_endpoint = host.vars.client_endpoint
+  assign where host.vars.os == "Linux"
+}
+
 apply Service for (users => config in host.vars.users) {
   import "generic-service"
 

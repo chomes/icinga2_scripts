@@ -1,37 +1,40 @@
 ---
-- hosts: servers
+# centos 7 only, however feel free to change the
+- hosts: rhel
   remote_user: ansible
   become: yes
   become_method: sudo
   connection: ssh
   gather_facts: yes
   tasks:
-    - name: Adding icingakey
-      apt_key:
-        url: https://packages.icinga.com/icinga.key
-        id: F51A91A5EE001AA5D77D53C4C6E319C334410682
-    - name: Adding ansible template
-      template:
-        src: icinga.j2
-        dest: /etc/apt/sources.list.d/icinga.list
-        backup: yes
-    - name: Updating cache
-      apt:
-        update_cache: yes
+    - name: Adding epel repo
+      yum:
+        name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+        state: present
+    - name: Adding icinga repo
+      yum:
+        name: https://packages.icinga.com/epel/icinga-rpm-release-7-latest.noarch.rpm
+        state: present
+    - name: install icinga key
+      rpm_key:
+        state: present
+        key: https://packages.icinga.com/icinga.key
     - name: Installing basic packages
-      apt:
+      yum:
         name:
           - vim
+          - vim-enhanced
           - screen
           - rdiff-backup
-          - python3-pip
-          - python-pip
           - wget
           - rsync
+          - python34
+          - python34-pip
+          - python2-pip
           - icinga2
-          - monitoring-plugins
+          - nagios-plugins-all
           - vim-icinga2
-          - vim-addon-manager
+          - icinga2-selinux
         update_cache: yes
         state: latest
     - name: include vars
@@ -42,8 +45,8 @@
       file:
         path: /var/lib/icinga2/certs
         state: directory
-        owner: nagios
-        group: nagios
+        owner: icinga
+        group: icinga
         mode: 0755
     - name: creating cert_key
       shell:
@@ -55,7 +58,6 @@
       shell:
         icinga2 node setup --ticket "{{host.get('request_ticket')}}" --cn "{{host.get('short_name')}}" --endpoint "{{host.get('master_shortname')}}","{{host.get('master_server')}}",5665 --zone "{{host.get('short_name')}}" --parent_zone master --parent_host "{{host.get('master_server')}}" --trustedcert /var/lib/icinga2/certs/trusted-parent.crt --accept-commands --accept-config --disable-confd
     - name: start and enable icinga
-      service:
-        name: icinga2
-        enabled: yes
-        state: started
+      service: icinga2
+      enabled: yes
+      state: started
