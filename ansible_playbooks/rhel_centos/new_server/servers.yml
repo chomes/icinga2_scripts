@@ -1,35 +1,39 @@
 ---
-- hosts: servers
+- hosts: rhel
   remote_user: ansible
   become: yes
   become_method: sudo
   connection: ssh
   gather_facts: yes
   tasks:
-    - name: Adding icingakey
-      apt_key:
-        url: https://packages.icinga.com/icinga.key
-        id: F51A91A5EE001AA5D77D53C4C6E319C334410682
-    - name: Adding ansible template
-      template:
-        src: icinga.j2
-        dest: /etc/apt/sources.list.d/icinga.list
-        backup: yes
-    - name: Adding certbot repo
-      apt_repository:
-        repo: 'ppa:certbot/certbot'
-    - name: Updating cache
-      apt:
-        update_cache: yes
+    - name: Adding epel repo
+      yum:
+        name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+        state: present
+    - name: Adding icinga repo
+      yum:
+        name: https://packages.icinga.com/epel/icinga-rpm-release-7-latest.noarch.rpm
+        state: present
+    - name: install icinga key
+      rpm_key:
+        state: present
+        key: https://packages.icinga.com/icinga.key
+    - name: installing yum utils
+      yum:
+        name:
+          - yum-utils
+        state: present
     - name: Installing basic packages
-      apt:
+      yum:
         name:
           - vim
+          - vim-enhanced
           - screen
           - python-certbot-apache
           - rdiff-backup
-          - python3-pip
-          - python-pip
+          - python34-pip
+          - python2-pip
+          - python2-certbot-apache
           - wget
           - rsync
           - icinga2
@@ -37,13 +41,12 @@
           - icinga2-ido-mysql
           - icingacli
           - monitoring-plugins
-          - apache2
+          - httpd
+          - httpd-devel
           - php
-          - libapache2-mod-php
           - php-mysql
           - php-ldap
           - vim-icinga2
-          - vim-addon-manager
         update_cache: yes
         state: latest
     - name: Replacing service file
