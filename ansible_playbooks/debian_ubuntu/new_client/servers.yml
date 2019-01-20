@@ -1,5 +1,5 @@
 ---
-- hosts: servers
+- hosts: debian
   remote_user: ansible
   become: yes
   become_method: sudo
