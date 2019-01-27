@@ -1,16 +1,20 @@
 ---
-- hosts: servers
+- hosts: test_server
   remote_user: ansible
   become: yes
   become_method: sudo
   connection: ssh
   gather_facts: yes
   tasks:
+    - name: apt upgrade
+      apt:
+        update_cache: yes
+        upgrade: full
     - name: Adding icingakey
       apt_key:
         url: https://packages.icinga.com/icinga.key
         id: F51A91A5EE001AA5D77D53C4C6E319C334410682
-    - name: Adding ansible template
+    - name: Adding ansible repo
       template:
         src: icinga.j2
         dest: /etc/apt/sources.list.d/icinga.list
@@ -46,6 +50,11 @@
           - vim-addon-manager
         update_cache: yes
         state: latest
+    - name: start and enable icinga
+      service:
+        name: icinga2
+        enabled: yes
+        state: started
     - name: Replacing service file
       template:
         src: services.j2
