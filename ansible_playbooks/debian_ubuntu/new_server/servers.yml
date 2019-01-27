@@ -49,14 +49,24 @@
           - php-mysql
           - php-ldap
           - vim-icinga2
+          - mysql-server
           - vim-addon-manager
         update_cache: yes
         state: latest
+    - name: enable ssl module
+      apache2_module:
+        state: present
+        name: ssl
     - name: start and enable icinga
       service:
         name: icinga2
         enabled: yes
         state: started
+    - name: start and enable apache
+      service:
+        name: apache2
+        enabled: yes
+        state: restarted
     - name: Replacing service file
       template:
         src: services.j2
