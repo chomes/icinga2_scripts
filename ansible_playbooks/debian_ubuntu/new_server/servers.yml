@@ -6,6 +6,8 @@
   connection: ssh
   gather_facts: yes
   tasks:
+    - name: adding multiverse repo
+      shell: add-apt-repository multiverse
     - name: apt upgrade
       apt:
         update_cache: yes
