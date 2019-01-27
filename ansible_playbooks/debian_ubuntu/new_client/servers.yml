@@ -58,4 +58,4 @@
       service:
         name: icinga2
         enabled: yes
-        state: started
+        state: restarted
