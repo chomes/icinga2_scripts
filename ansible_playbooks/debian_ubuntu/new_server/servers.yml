@@ -16,7 +16,7 @@
       apt_key:
         url: https://packages.icinga.com/icinga.key
         id: F51A91A5EE001AA5D77D53C4C6E319C334410682
-    - name: Adding ansible repo
+    - name: Adding icinga repo
       template:
         src: icinga.j2
         dest: /etc/apt/sources.list.d/icinga.list
